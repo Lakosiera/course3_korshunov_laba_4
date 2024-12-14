@@ -2,7 +2,7 @@ from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from .forms import UploadFileForm
-from .file_utils import handle_uploaded_file
+from .file_utils import handle_uploaded_file, read_dir
 
 
 # пример простейшей вьющки
@@ -12,8 +12,10 @@ def hello_world(request):
 
 
 def index(request):
+    files = read_dir()
     context = {
         "name": "laba_4",
+        "files": files
     }
     # ренедр вьюшки в html страницу
     return render(request, "index.html", context)
