@@ -8,4 +8,8 @@ def hello_world(request):
 
 
 def index(request):
-    return HttpResponse("Hello, world! Laba 4")
+    context = {
+        "name": "laba_4",
+    }
+    # ренедр вьюшки в html страницу
+    return render(request, "index.html", context)
