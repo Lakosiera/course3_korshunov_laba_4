@@ -24,23 +24,14 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
 
         if form.is_valid():
-            handle_uploaded_file(request.FILES["file"])
+            file=request.FILES["file"]
+            title = request.POST["title"]
+            if not title:
+                title=file.name
+            handle_uploaded_file(file, title)
             messages.success(request, "Импорт завершен успешно")
-            # return HttpResponseRedirect("/success/url/")
-            return HttpResponseRedirect(  # создаем редирект
-                reverse(
-                    # имя редиреакта из "urls.py"
-                    "index"
-                )
-            )
         else:
             messages.error(request, "Импорт завершен неудачно")
-            return HttpResponseRedirect(  # создаем редирект
-                reverse(
-                    # имя редиреакта из "urls.py"
-                    "index"
-                )
-            )
     else:
         messages.warning(request, "Неверный формат запроса")
 
