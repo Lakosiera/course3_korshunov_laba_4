@@ -24,65 +24,85 @@
     <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center">
       <div class="container">
         <div class="row justify-content-center">
-          <div class="col-md-6">
-            <div class="card shadow">
-              <div class="card-header">Музыкальные альбомы</div>
+          <div class="col-md-10">
+            <div class="card text-center">
+              <div class="card-header">
+                <div class="mb-2">Музыкальные альбомы</div>
+                
+                <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tab_index == "0" %} active {% endif %}" id="input-tab" data-bs-toggle="tab" data-bs-target="#input-tab-pane" type="button" role="tab" aria-controls="input-tab-pane" aria-selected="true">Ручной ввод</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tab_index == "1" %} active {% endif %}" id="import-tab" data-bs-toggle="tab" data-bs-target="#import-tab-pane" type="button" role="tab" aria-controls="import-tab-pane" aria-selected="false">Импорт</button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tab_index == "2" %} active {% endif %}" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-tab-pane" type="button" role="tab" aria-controls="export-tab-pane" aria-selected="false">Экспорт</button>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card-body shadow">
+                <div class="tab-content" id="myTabContent">
+                  <div class="tab-pane fade show active" id="input-tab-pane" role="tabpanel" aria-labelledby="input-tab" tabindex="0">
+                    <!-- Ручной ввод -->
+                    <!-- TODO Ручной ввод -->
+                     <div style="height: 200px;"></div>
+                  </div>
+                  
+                  <div class="tab-pane fade" id="import-tab-pane" role="tabpanel" aria-labelledby="import-tab" tabindex="0">
+                    <form class="needs-validation" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+                      <!-- Говорим чтобы Django занялся безопасность запроса из формы (Cross Site Request Forgeries) -->
+                      {% csrf_token %}
+
+                      <div class="mb-3">
+                        <input name="title" class="form-control" type="text" placeholder="Имя файла на сервере" aria-label="default input example" />
+                      </div>
+
+                      <div class="mb-3">
+                        <!-- label for="formFile" class="form-label">Default file input example</label -->
+                        <input name="file" class="form-control" type="file" id="formFile" required />
+                      </div>
+
+                      <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">Импорт</button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div class="tab-pane fade" id="export-tab-pane" role="tabpanel" aria-labelledby="export-tab" tabindex="0">
+                    <ul class="list-group mb-3">
+                      {% if files %}
+                        {% for file in files %}
+                          <li class="list-group-item list-group-item-success text-truncate">{{ file }}</li>
+                        {% endfor %}
+                      {% else %}
+                        <li class="list-group-item list-group-item-warning">Файлов нет</li>
+                      {% endif %}
+                    </ul>
+
+                    <div class="d-grid gap-2">
+                      <a href="#" class="btn btn-success">Экспорт</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <!-- сообщения (об ошибках и другие) -->
               {% if messages %}
-                <div class="card-body bg-info-subtle border-bottom mb-0 py-0">
+                <div class="card-footer bg-info-subtle mb-0 py-0">
                   <!-- перебираем сообщения -->
                   {% for message in messages %}
                     <div class="mt-3 alert alert-dismissible fade show {% if message.tags == 'error' %}
-                        
-                        
-                        
-                        
                         alert-danger
-
-
-
-
                       {% elif message.tags == 'info' %}
-                        
-                        
-                        
-                        
                         alert-info
-
-
-
-
                       {% elif message.tags == 'warning' %}
-                        
-                        
-                        
-                        
                         alert-warning
-
-
-
-
                       {% elif message.tags == 'success' %}
-                        
-                        
-                        
-                        
                         alert-success
-
-
-
-
                       {% else %}
-                        
-                        
-                        
-                        
                         alert-primary
-
-
-
-
                       {% endif %}"
                       role="alert">
                       {{ message }}
@@ -91,44 +111,6 @@
                   {% endfor %}
                 </div>
               {% endif %}
-
-              <div class="card-body">
-                <form class="needs-validation" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
-                  <!-- Говорим чтобы Django занялся безопасность запроса из формы (Cross Site Request Forgeries) -->
-                  {% csrf_token %}
-
-                  <div class="mb-3">
-                    <input name="title" class="form-control" type="text" placeholder="Имя файла на сервере" aria-label="default input example" />
-                  </div>
-
-                  <div class="mb-3">
-                    <!-- label for="formFile" class="form-label">Default file input example</label -->
-                    <input name="file" class="form-control" type="file" id="formFile" required />
-                  </div>
-
-                  <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-danger">Импорт</button>
-                  </div>
-                </form>
-              </div>
-
-              <div class="card-body py-0">
-                <ul class="list-group">
-                  {% if files %}
-                    {% for file in files %}
-                      <li class="list-group-item list-group-item-success text-truncate">{{ file }}</li>
-                    {% endfor %}
-                  {% else %}
-                    <li class="list-group-item list-group-item-warning">Файлов нет</li>
-                  {% endif %}
-                </ul>
-              </div>
-
-              <div class="card-body">
-                <div class="d-grid gap-2">
-                  <a href="#" class="btn btn-success">Экспорт</a>
-                </div>
-              </div>
             </div>
           </div>
         </div>

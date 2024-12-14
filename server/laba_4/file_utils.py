@@ -24,6 +24,5 @@ def read_dir():
         base_name=Path(file_name).stem.replace("_", "/")
         name=b64decode(base_name).decode().split("-", 1)
         result.append(name[1])
-        pass
     return result
 
