@@ -30,35 +30,36 @@
 
               <!-- сообщения (об ошибках и другие) -->
               {% if messages %}
-                <div class="card-body">
-                  <ul class="list-group mb-3">
-                    <!-- перебираем сообщения -->
-                    {% for message in messages %}
-                      {% if message.tags == 'error' %}
-                        <!-- сообщения об ошибках -->
-                        <li class="list-group-item list-group-item-danger">{{ message }}</li>
+                <div class="card-body bg-info-subtle border-bottom mb-0 py-0">
+                  <!-- перебираем сообщения -->
+                  {% for message in messages %}
+                    <div class="mt-3 alert alert-dismissible fade show {% if message.tags == 'error' %}
+                        alert-danger
                       {% elif message.tags == 'info' %}
-                        <!-- сообщения информационные -->
-                        <li class="list-group-item list-group-item-info">{{ message }}</li>
+                        alert-info
                       {% elif message.tags == 'warning' %}
-                        <!-- сообщения требующие внимания -->
-                        <li class="list-group-item list-group-item-warning">{{ message }}</li>
+                        alert-warning
                       {% elif message.tags == 'success' %}
-                        <!-- сообщения об успехе -->
-                        <li class="list-group-item list-group-item-success">{{ message }}</li>
+                        alert-success
                       {% else %}
-                        <!-- все отсльные типы сообщений -->
-                        <li class="list-group-item list-group-item-primary">{{ message }}</li>
-                      {% endif %}
-                    {% endfor %}
-                  </ul>
+                        alert-primary
+                      {% endif %}"
+                      role="alert">
+                      {{ message }}
+                      <button type="button" data-bs-dismiss="alert" aria-label="Close" class="btn-close"></button>
+                    </div>
+                  {% endfor %}
                 </div>
               {% endif %}
 
               <div class="card-body">
-                <form class="needs-validation" action="{% url 'upload' %}" method="post">
+                <form class="needs-validation" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
                   <!-- Говорим чтобы Django занялся безопасность запроса из формы (Cross Site Request Forgeries) -->
                   {% csrf_token %}
+
+                  <div class="mb-3">
+                    <input name="title" class="form-control" type="text" placeholder="Имя файла на сервере" aria-label="default input example">
+                  </div>
 
                   <div class="mb-3">
                     <!-- label for="formFile" class="form-label">Default file input example</label -->

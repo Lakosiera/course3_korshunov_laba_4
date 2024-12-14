@@ -22,19 +22,31 @@ def index(request):
 def upload_file(request):
     if request.method == "POST":
         form = UploadFileForm(request.POST, request.FILES)
-        messages.success(request, len(request.FILES))
+
         if form.is_valid():
             handle_uploaded_file(request.FILES["file"])
-            messages.success(request, "Ипорт завершон успешно")
-            return HttpResponseRedirect("/success/url/")
-            # return HttpResponseRedirect(  # создаем редирект
-            #     reverse(
-            #         # имя редиреакта из "urls.py"
-            #         "index"
-            #     )
-            # )
-        
-        messages.info(request, "Test")
+            messages.success(request, "Импорт завершен успешно")
+            # return HttpResponseRedirect("/success/url/")
+            return HttpResponseRedirect(  # создаем редирект
+                reverse(
+                    # имя редиреакта из "urls.py"
+                    "index"
+                )
+            )
+        else:
+            messages.error(request, "Импорт завершен неудачно")
+            return HttpResponseRedirect(  # создаем редирект
+                reverse(
+                    # имя редиреакта из "urls.py"
+                    "index"
+                )
+            )
     else:
-        form = UploadFileForm()
-    return render(request, "upload.html", {"form": form})
+        messages.warning(request, "Неверный формат запроса")
+
+    return HttpResponseRedirect(  # создаем редирект
+        reverse(
+            # имя редиреакта из "urls.py"
+            "index"
+        )
+    )
