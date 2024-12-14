@@ -18,48 +18,65 @@
 
   <body class="d-flex flex-column vh-100">
     <nav class="nav justify-content-end shadow">
-      <!-- <div class="my-icon"><a class="nav-link" href="/"></a></div> -->
       <a class="nav-link" href="/">На главную</a>
-      <!-- <a class="nav-link" href="admin/">Админка</a> -->
     </nav>
 
-    <div class="flex-grow-1 d-flex align-items-center justify-content-center">
-      <div class="card shadow mx-auto" style="width: 18rem;">
-        <div class="card-header">Музыкальные альбомы</div>
-        <!--div class="card-body">
-          <p class="card-text">Доступные слова</p>
-        </div-->
+    <div class="flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6">
+            <div class="card shadow">
+              <div class="card-header">Музыкальные альбомы</div>
 
-        <div class="card-body">
-          <!-- сообщения (об ошибках и другие) -->
-          {% if messages %}
-            <ul class="list-group mb-3">
-              <!-- перебираем сообщения -->
-              {% for message in messages %}
-                {% if message.tags == 'error' %}
-                  <!-- сообщения об ошибках -->
-                  <li class="list-group-item list-group-item-danger">{{ message }}</li>
-                {% elif message.tags == 'info' %}
-                  <!-- сообщения информационные -->
-                  <li class="list-group-item list-group-item-info">{{ message }}</li>
-                {% elif message.tags == 'warning' %}
-                  <!-- сообщения требующие внимания -->
-                  <li class="list-group-item list-group-item-warning">{{ message }}</li>
-                {% elif message.tags == 'success' %}
-                  <!-- сообщения об успехе -->
-                  <li class="list-group-item list-group-item-success">{{ message }}</li>
-                {% else %}
-                  <!-- все отсльные типы сообщений -->
-                  <li class="list-group-item list-group-item-primary">{{ message }}</li>
-                {% endif %}
-              {% endfor %}
-            </ul>
-          {% endif %}
+              <!-- сообщения (об ошибках и другие) -->
+              {% if messages %}
+                <div class="card-body">
+                  <ul class="list-group mb-3">
+                    <!-- перебираем сообщения -->
+                    {% for message in messages %}
+                      {% if message.tags == 'error' %}
+                        <!-- сообщения об ошибках -->
+                        <li class="list-group-item list-group-item-danger">{{ message }}</li>
+                      {% elif message.tags == 'info' %}
+                        <!-- сообщения информационные -->
+                        <li class="list-group-item list-group-item-info">{{ message }}</li>
+                      {% elif message.tags == 'warning' %}
+                        <!-- сообщения требующие внимания -->
+                        <li class="list-group-item list-group-item-warning">{{ message }}</li>
+                      {% elif message.tags == 'success' %}
+                        <!-- сообщения об успехе -->
+                        <li class="list-group-item list-group-item-success">{{ message }}</li>
+                      {% else %}
+                        <!-- все отсльные типы сообщений -->
+                        <li class="list-group-item list-group-item-primary">{{ message }}</li>
+                      {% endif %}
+                    {% endfor %}
+                  </ul>
+                </div>
+              {% endif %}
 
-          <div class="d-grid gap-2">
-            <!-- указываем путь ссылки через имя "quiz" в "urls.py" и пердаем аргумент last_index -->
-            <a href="#" class="btn btn-danger">Импорт</a>
-            <a href="#" class="btn btn-success">Экспорт</a>
+              <div class="card-body">
+                <form class="needs-validation" action="{% url 'upload' %}" method="post">
+                  <!-- Говорим чтобы Django занялся безопасность запроса из формы (Cross Site Request Forgeries) -->
+                  {% csrf_token %}
+
+                  <div class="mb-3">
+                    <!-- label for="formFile" class="form-label">Default file input example</label -->
+                    <input name="file" class="form-control" type="file" id="formFile" required />
+                  </div>
+
+                  <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger">Импорт</button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="card-body">
+                <div class="d-grid gap-2">
+                  <a href="#" class="btn btn-success">Экспорт</a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

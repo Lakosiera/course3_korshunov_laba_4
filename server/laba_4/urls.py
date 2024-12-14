@@ -8,6 +8,11 @@ urlpatterns = [
     path(
         route="",  # путь
         view=views.index,  # вьюшка из файла 'views.py'
-        name="index",  # условное имя пути (можно неуказывать)
+        name="index",  # условное имя пути
+    ),
+    path(
+        route="upload",  # путь
+        view=views.upload_file,  # вьюшка из файла 'views.py'
+        name="upload", 
     ),
 ]

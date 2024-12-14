@@ -1,5 +1,9 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, reverse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
+from .forms import UploadFileForm
+from .file_utils import handle_uploaded_file
+
 
 # пример простейшей вьющки
 def hello_world(request):
@@ -13,3 +17,24 @@ def index(request):
     }
     # ренедр вьюшки в html страницу
     return render(request, "index.html", context)
+
+
+def upload_file(request):
+    if request.method == "POST":
+        form = UploadFileForm(request.POST, request.FILES)
+        messages.success(request, len(request.FILES))
+        if form.is_valid():
+            handle_uploaded_file(request.FILES["file"])
+            messages.success(request, "Ипорт завершон успешно")
+            return HttpResponseRedirect("/success/url/")
+            # return HttpResponseRedirect(  # создаем редирект
+            #     reverse(
+            #         # имя редиреакта из "urls.py"
+            #         "index"
+            #     )
+            # )
+        
+        messages.info(request, "Test")
+    else:
+        form = UploadFileForm()
+    return render(request, "upload.html", {"form": form})
