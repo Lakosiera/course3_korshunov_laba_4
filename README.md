@@ -77,33 +77,4 @@ docker compose exec service_name sh
 
 ### Джанго проверка
 
-[http://127.0.0.1:8080/](http://127.0.0.1:8080/)
-
-## Postgrs
-
-```sh
-su - postgres -c psql
-```
-
-Создание пользователя и таблицы
-
-```sql
-CREATE USER django WITH PASSWORD 'django';  
-CREATE DATABASE laba3;
-GRANT ALL ON DATABASE laba3 TO django;
-ALTER DATABASE laba3 OWNER TO django;
-```
-
-### Django
-
-Миграция для админки
-
-```sh
-python manage.py migrate
-```
-
-Создаение суперпользователя
-
-```sh
-python manage.py createsuperuser
-```
+[http://127.0.0.1:8004/](http://127.0.0.1:8004/)
