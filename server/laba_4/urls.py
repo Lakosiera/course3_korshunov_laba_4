@@ -11,6 +11,11 @@ urlpatterns = [
         name="index",  # условное имя пути
     ),
     path(
+        route="create",  # путь
+        view=views.create,  # вьюшка из файла 'views.py'
+        name="create", 
+    ),
+    path(
         route="upload",  # путь
         view=views.upload_file,  # вьюшка из файла 'views.py'
         name="upload", 
@@ -19,5 +24,10 @@ urlpatterns = [
         route="download/<str:filename>",  # путь  (т.е. /download/1734359984-ДАННЫЕ_ДЛЯ_ИМПОРТА.json")
         view=views.download,  # вьюшка из файла 'views.py'
         name="download", 
+    ),
+    path(
+        route="delete/<str:filename>",  # путь  (т.е. /delete/1734359984-ДАННЫЕ_ДЛЯ_ИМПОРТА.json")
+        view=views.delete,  # вьюшка из файла 'views.py'
+        name="delete", 
     ),
 ]
