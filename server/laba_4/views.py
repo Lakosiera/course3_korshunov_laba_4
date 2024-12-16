@@ -1,8 +1,8 @@
 from django.shortcuts import render, reverse
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse, Http404
 from django.contrib import messages
 from .forms import UploadFileForm
-from .file_utils import handle_uploaded_file, read_dir
+from .file_utils import handle_uploaded_file, read_file, read_dir
 
 COOKIE_ACTIVE_TAB="active_tab"
 
@@ -48,4 +48,10 @@ def upload_file(request):
         )
     )
     response.set_cookie(COOKIE_ACTIVE_TAB, 1)
+    return response
+
+def download(request, filename):
+    response = FileResponse(read_file(filename))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
