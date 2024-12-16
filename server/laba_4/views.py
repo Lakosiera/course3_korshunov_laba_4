@@ -1,12 +1,12 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.contrib import messages
-from .forms import ImportFileForm
-from .file_utils import write_file, read_file, read_dir, delete_file
+from .forms import MusicAlbumForm, ImportFileForm
+from .file_utils import write_json, write_file, read_file, read_dir, delete_file
 
 
 # имя куки для хранения номера вкладки
-COOKIE_ACTIVE_TAB="active_tab"
+COOKIE_ACTIVE_TAB = "active_tab"
 
 
 # пример простейшей вьющки
@@ -37,7 +37,36 @@ def index(request):
 # вьюшка для создания альбома
 # она не отображает свою страницу а перенаправляет на главную
 def create(request):
-  # создаем ответ с редиректом на главную страницу
+    # проверяем что медод запроса "POST"
+    if request.method == "POST":
+        # получаем данные формы из запроса
+        form = MusicAlbumForm(request.POST)
+
+        # проверяем что форма верна
+        if form.is_valid():
+            # вытаскиваем поле "title" из формы
+            filename = form.cleaned_data["filename"]
+
+            #  удаляем поле именя файла из данных для записи в json
+            form.cleaned_data.pop('filename', None)
+
+            try:
+                # записываем json на диск
+                write_json(filename, form.cleaned_data)
+                
+                # отправляем сообщение что файл импортирован
+                messages.success(request, "Создание завершен успешно")
+            except Exception as e:
+                # ловим ошибки при записе
+                messages.error(request, f"ошибка при создании альбома{e}")
+    
+        else:
+            # форма не верна, отправляем сообщение об ошибке
+            messages.error(request, f"Некоректные даннве из формы\n{form.errors.as_json()}")
+    else:
+        # запрос был не "POST" отправляем сообщение с ошибкой
+        messages.warning(request, "Неверный формат запроса")
+    # создаем ответ с редиректом на главную страницу
     response = HttpResponseRedirect(  # создаем редирект
         reverse(
             # имя редиреакта из "urls.py"
@@ -54,26 +83,26 @@ def create(request):
 def upload_file(request):
     # проверяем что медод запроса "POST"
     if request.method == "POST":
-        # получаем данные фолрмы из запроса
+        # получаем данные формы из запроса
         form = ImportFileForm(request.POST, request.FILES)
-        
+
         # проверяем что форма верна
         if form.is_valid():
             # вытаскиваем данные файла из формы
-            file=request.FILES["file"]
+            file = form.cleaned_data["file"]
             # вытаскиваем поле "title" из формы
-            title = request.POST["title"]
+            filename = form.cleaned_data["filename"]
             # если поле "title" не задано
-            if not title:
+            if not filename:
                 # имя фала остаеться изначальным
-                title=file.name
+                filename = file.name
             # записываем файл на диск
-            write_file(file, title)
+            write_file(filename, file)
             # отправляем сообщение что файл импортирован
             messages.success(request, "Импорт завершен успешно")
         else:
             # форма не верна, отправляем сообщение об ошибке
-            messages.error(request, "Импорт завершен неудачно")
+            messages.error(request, f"Некоректные даннве из формы\n{form.errors.as_json()}")
     else:
         # запрос был не "POST" отправляем сообщение с ошибкой
         messages.warning(request, "Неверный формат запроса")
@@ -96,9 +125,9 @@ def download(request, filename):
     # создаем ответ с данными файла
     response = FileResponse(read_file(filename))
     # устанавливаем тип ответа "octet-stream" чтобы браузер качал файл а не открыл как страницу
-    response['Content-Type'] = 'application/octet-stream'
+    response["Content-Type"] = "application/octet-stream"
     # устанавливаем имя файла
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
 
 

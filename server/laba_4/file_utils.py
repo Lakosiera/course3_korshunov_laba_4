@@ -1,17 +1,39 @@
-import time
-from datetime import datetime
 from os import listdir, path, remove
-from .models import ExportFile
+import json
+
 
 # директория для хранения медиафайлов
 STOTRAGE_FOLDER = "/storage"
 
 
-# метод для записи файла
-def write_file(file, title):
-    # формат имения "время_создания-имя_файла"
-    filename = f"{int(time.time())}-{title}"
+# метод для записи json файла
+def write_json(filename, data):
+    jsonfile = f"{STOTRAGE_FOLDER}/{filename}.json"
+    # если файл уже существует
+    if path.isfile(jsonfile):
+        # читаем json файл (+ - запись в файл включена)
+        with open(jsonfile,'r+', encoding='utf8') as infile:
+            # читам json из фала
+            json_data = json.load(infile)
+            # добавляем запись в массив
+            json_data.append(data)
+            # перемещаемся в начало файла (чтбы переписать содержимое)
+            infile.seek(0)
+            # перезаписываем файл
+            json.dump(json_data, infile, indent = 4, ensure_ascii=False)
+    else:
+        # если файла не существует создаем файл
+        with open(jsonfile, "w", encoding='utf8') as outfile:
+            # создаем josn с пустым массивом
+            json_data = json.loads("[]")
+            # добавляем запись в массив
+            json_data.append(data)
+            # записываем json в файл (с ворматированием отступов 4 пробела)
+            json.dump(json_data, outfile, indent = 4, ensure_ascii=False)
 
+
+# метод для записи файла
+def write_file(filename, file):
     # открыть файл для "w" - записи, "b" - как бинарный файл
     with open(f"{STOTRAGE_FOLDER}/{filename}", "wb+") as destination:
         # для каждого "кусочка" (chunk) данных
@@ -43,30 +65,8 @@ def read_dir():
     result = []
     # перебираем все имена файлов из директории
     for filename in dir_list:
-        # разделяем име по первому встречному символу "-"
-        # чтобы получить время создания и оригинальное имя файла
-        name = filename.split("-", 1)
-        # добавляем в результат обьект с данными файла
-        result.append(
-            # создаем экземпляр можели для экспорта файла
-            ExportFile.create(
-                title=name[1], # имя для отображения
-                filename=filename, # полное имя файла
-                created_at=to_date(name[0]) # дата создания
-            )
-        )
+        # добавляем в результат имя файла
+        result.append(filename)
     # возврвщвем результат
     return result
-
-
-# метод для преобразования timestamp (1734359992) в привычный формат дата-время
-def to_date(text):
-    try:
-        # преабразуем строку с timestamp в целое число
-        timestamp=int(text)
-        # получаем дату из timestamp
-        return datetime.fromtimestamp(timestamp)
-    except ValueError:
-        # если что то пошло не так возвращаем текущую дату
-        return time.time()
     
