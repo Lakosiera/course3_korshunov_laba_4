@@ -5,3 +5,7 @@
     min-height: 32px;
     min-width: 32px;
 }
+
+.my-message p, .my-message ul {
+    margin-bottom: 0 !important;
+}

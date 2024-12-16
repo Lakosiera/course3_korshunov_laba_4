@@ -52,13 +52,12 @@
                 </ul>
               </div>
 
+              <!-- Тело карточки -->
               <div class="card-body">
                 <!-- Содержание вкладок -->
                 <div class="tab-content" id="myTabContent">
+                  <!-- Вкладка Создать -->
                   <div class="tab-pane fade {% if tab_index == "0" %} show active {% endif %}" id="input-tab-pane" role="tabpanel" aria-labelledby="input-tab" tabindex="0">
-                    <!-- Вкладка Создать -->
-
-                    <!-- Вкладка Импорт -->
                     <!-- Форма для создания альбома -->
                     <!-- метод загрузки формы 'create' из "urls.py" -->
                     <form class="needs-validation" action="{% url 'create' %}" method="post">
@@ -113,7 +112,7 @@
 
                         <div class="col-md-2">
                           <!-- Число трэков в альбоме -->
-                          <input name="length" class="form-control" type="number" placeholder="Трэков" aria-label="length input" />
+                          <input name="length" class="form-control" type="number" placeholder="Трэки" aria-label="length input" />
                         </div>
                       </div>
 
@@ -123,10 +122,9 @@
                       </div>
                     </form>
                   </div>
-                  
-                  <div class="tab-pane fade {% if tab_index == "1" %} show active {% endif %}" id="import-tab-pane" role="tabpanel" aria-labelledby="import-tab" tabindex="0">
-                    <!-- Вкладка Импорт -->
 
+                  <!-- Вкладка Импорт -->
+                  <div class="tab-pane fade {% if tab_index == "1" %} show active {% endif %}" id="import-tab-pane" role="tabpanel" aria-labelledby="import-tab" tabindex="0">
                     <!-- Форма для импорта файла -->
                     <!-- метод загрузки формы 'upload' из "urls.py" -->
                     <!-- обязательно метод "post" -->
@@ -152,11 +150,10 @@
                     </form>
                   </div>
 
+                  <!-- Вкладка Экспорт -->
                   <div class="tab-pane fade {% if tab_index == "2" %} show active {% endif %}" id="export-tab-pane" role="tabpanel" aria-labelledby="export-tab" tabindex="0">
-                    <!-- Вкладка Экспорт -->
-
                     <ul class="list-group">
-                      <!-- Если есть список файло -->
+                      <!-- Если есть список файлов -->
                       {% if files %}
                         <!-- перебираем файлы -->
                         {% for file in files %}
@@ -181,8 +178,8 @@
                 </div>
               </div>
            
-              <div class="card-footer py-0">
-                <!-- сообщения (об ошибках и другие) -->
+              <!-- сообщения (об ошибках и другие) -->
+              <div class="my-message card-footer py-0">
                 {% if messages %}
                   <!-- перебираем сообщения -->
                   {% for message in messages %}
@@ -200,7 +197,9 @@
                       {% endif %}"
                       role="alert">
                       <!-- сообщение -->
-                      {{ message }}
+                      <div class="text-start">
+                        {{ message | linebreaks }}
+                      </div>
                       <!-- закрыть сообщение -->
                       <button type="button" data-bs-dismiss="alert" aria-label="Close" class="btn-close"></button>
                     </div>

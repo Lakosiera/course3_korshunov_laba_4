@@ -17,12 +17,12 @@ urlpatterns = [
     ),
     path(
         route="upload",  # путь
-        view=views.upload_file,  # вьюшка из файла 'views.py'
+        view=views.import_file,  # вьюшка из файла 'views.py'
         name="upload", 
     ),
     path(
         route="download/<str:filename>",  # путь  (т.е. /download/1734359984-ДАННЫЕ_ДЛЯ_ИМПОРТА.json")
-        view=views.download,  # вьюшка из файла 'views.py'
+        view=views.download_file,  # вьюшка из файла 'views.py'
         name="download", 
     ),
     path(

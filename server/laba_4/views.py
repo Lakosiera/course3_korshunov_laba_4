@@ -1,9 +1,9 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.contrib import messages
+import json
 from .forms import MusicAlbumForm, ImportFileForm
 from .file_utils import write_json, write_file, read_file, read_dir, delete_file
-
 
 # имя куки для хранения номера вкладки
 COOKIE_ACTIVE_TAB = "active_tab"
@@ -44,28 +44,28 @@ def create(request):
 
         # проверяем что форма верна
         if form.is_valid():
-            # вытаскиваем поле "title" из формы
-            filename = form.cleaned_data["filename"]
+            # вытаскиваем поле "title" из запроса
+            filename = request.POST["filename"]
 
-            #  удаляем поле именя файла из данных для записи в json
-            form.cleaned_data.pop('filename', None)
-
+            # обработка ошибок что могут возникнуть при записи
             try:
                 # записываем json на диск
                 write_json(filename, form.cleaned_data)
-                
+
                 # отправляем сообщение что файл импортирован
                 messages.success(request, "Создание завершен успешно")
             except Exception as e:
                 # ловим ошибки при записе
                 messages.error(request, f"ошибка при создании альбома{e}")
-    
+
         else:
             # форма не верна, отправляем сообщение об ошибке
-            messages.error(request, f"Некоректные даннве из формы\n{form.errors.as_json()}")
+            messages.error(request, "Некоректные даннве из формы")
+            messages.error(request, f"{form.errors.as_ul()}")
     else:
         # запрос был не "POST" отправляем сообщение с ошибкой
         messages.warning(request, "Неверный формат запроса")
+
     # создаем ответ с редиректом на главную страницу
     response = HttpResponseRedirect(  # создаем редирект
         reverse(
@@ -80,11 +80,14 @@ def create(request):
 
 # вьюшка для импорта файла
 # она не отображает свою страницу а перенаправляет на главную
-def upload_file(request):
+def import_file(request):
     # проверяем что медод запроса "POST"
     if request.method == "POST":
         # получаем данные формы из запроса
-        form = ImportFileForm(request.POST, request.FILES)
+        form = ImportFileForm(
+            data=request.POST, # данные из формы
+            files=request.FILES, # файлы из формы
+        )
 
         # проверяем что форма верна
         if form.is_valid():
@@ -96,16 +99,53 @@ def upload_file(request):
             if not filename:
                 # имя фала остаеться изначальным
                 filename = file.name
-            # записываем файл на диск
-            write_file(filename, file)
-            # отправляем сообщение что файл импортирован
-            messages.success(request, "Импорт завершен успешно")
+
+            # обработка ошибок что могут возникнуть при работе с файлами
+            try:
+                # переменная для валидации файла
+                file_is_valid = True
+                # загружаем файл как json данные (на самомо деле в python то просто словарь ключ-значение)
+                json_data = json.load(file)
+
+                if not isinstance(json_data, list):
+                    file_is_valid = False
+                    messages.error(request, "JSON не содержит массив Альбомов")
+
+                # перебираем все элементы json массива
+                for json_item in json_data:
+                    # конвертируем json данные ворму данных альбома
+                    albom = MusicAlbumForm(
+                        data=json_item # данные из словаря json
+                    )
+                    # проверяем данные на валидность
+                    if not albom.is_valid():
+                        # ставим флаг что данныве невалидны
+                        file_is_valid = False
+                        # выводим сообщение
+                        messages.error(request, f"{albom.errors.as_ul()}")
+                        messages.error(request, f"{json.dumps(json_item, indent = 4, ensure_ascii=False)}")
+                        
+                # если файл прошел валидацию
+                if file_is_valid:
+                    # записываем файл на диск
+                    write_file(filename, file)
+
+                    # отправляем сообщение что файл импортирован
+                    messages.success(request, "Импорт завершен успешно")
+                else:
+                    # если файл непрошел валидацию
+                    # запрос был не "POST" отправляем сообщение с ошибкой
+                    messages.error(request, "Импорт неудался")
+            except Exception as e:
+                # выводим сообщение об ошибке
+                messages.error(request, f"{e}")
+
         else:
             # форма не верна, отправляем сообщение об ошибке
-            messages.error(request, f"Некоректные даннве из формы\n{form.errors.as_json()}")
+            messages.error(request, f"Некоректные даннве из формы\n{form.errors.as_text()}")
     else:
         # запрос был не "POST" отправляем сообщение с ошибкой
-        messages.warning(request, "Неверный формат запроса")
+        messages.error(request, "Неверный формат запроса")
 
     # создаем ответ с редиректом на главную страницу
     response = HttpResponseRedirect(  # создаем редирект
@@ -121,7 +161,7 @@ def upload_file(request):
 
 # вьбшка для скачивания файла
 # нет своей страницы, просто качает файл
-def download(request, filename):
+def download_file(request, filename):
     # создаем ответ с данными файла
     response = FileResponse(read_file(filename))
     # устанавливаем тип ответа "octet-stream" чтобы браузер качал файл а не открыл как страницу
